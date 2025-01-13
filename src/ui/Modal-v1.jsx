@@ -1,9 +1,8 @@
 import styled from "styled-components";
-import React, {useContext, cloneElement, useState, createContext, useEffect, useRef} from "react";
+import React, {cloneElement} from "react";
 import {HiXMark} from "react-icons/hi2";
 import {createPortal} from "react-dom";
-import useOutsideClick from "../hooks/useModal.js";
-
+import {createContext, useContext, useState} from "@types/react";
 
 const StyledModal = styled.div`
   position: fixed;
@@ -52,54 +51,26 @@ const Button = styled.button`
     stroke: var(--color-grey-500); */
     color: var(--color-grey-500);
   }
-`
-//TODO Step 1 Create Context
-const ModalContext = createContext();
+`;
 
-//TODO Step 2 Create Parent Component of Compound Component
-const Modal = ({children}) => {
 
-    const [openName, setOpenName] = useState("");
-    const close =  ()=>setOpenName("")
-    const open =  setOpenName
-    return(
-        <ModalContext.Provider value={{openName,open,close}}>
-            {children}
-        </ModalContext.Provider>
-    )
-}
 
-const Open = ({children, opens:opensWindowName}) => {
-    const {open} = useContext(ModalContext)
+const ModalV2 = ({children, onCloseModal}) => {
 
-    const  NewButtonCloned=cloneElement(children,{onClick:()=>open(opensWindowName)})
-    return NewButtonCloned
-}
-
-const Window = ({children, name}) => {
-
-    const {openName,close}=useContext(ModalContext)
-
-    const ref=useOutsideClick()
-
-    if(name !== openName) return null
+    const [isOpenModal, setIsOpenModal] = useState(false);
 
     return createPortal(
         <Overlay>
-            <StyledModal ref={ref}>
-                <Button onClick={close} >
+            <StyledModal>
+                <Button onClick={onCloseModal}>
                     <HiXMark/>
                 </Button>
                 <div>
-                    {cloneElement(children,{onCloseModal:close})}
+                    {children}
                 </div>
             </StyledModal>
         </Overlay>, document.body
     )
 }
 
-Modal.Open = Open;
-Modal.Window = Window;
-
-
-export default Modal
+export default ModalV2
